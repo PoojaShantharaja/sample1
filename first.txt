@@ -1,1 +1,29 @@
-bdfjhdhf
+select count(post_id) as cnt, dispname, rep
+FROM
+(select u.displayname as dispname, u.reputation as rep, posts.post_id as pid from users u
+JOIN posts 
+ON u.users_id=posts.owneruserid
+GROUP BY dispname, rep, pid )
+ORDER BY reputation DESC LIMIT 1;
+
+
+select u.displayname,u.reputation, COUNT(p.post_id) as pcnt
+FROM users u
+JOIN posts p ON (u.users_id=p.owneruserid)
+GROUP BY u.displayname, u.reputation 
+ORDER BY pcnt DESC LIMIT 10;
+
+
+
+
+with table_with_ranking as (
+select *,
+row_number() over (partition by customerid order by cast(date as datetime)) as ranking
+)
+
+select avg(before.MERCHAMOUNT) as MERCHAMOUNT_avg_prior, now.customerid, now.ranking
+from table_with_ranking now
+join table_with_ranking before
+on now.customerid = before.customerid
+and before.ranking <= now.ranking - 1  
+group by now.customerid, now.ranking
